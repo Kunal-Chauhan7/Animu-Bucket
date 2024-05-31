@@ -1,5 +1,5 @@
 import { type } from "@testing-library/user-event/dist/type";
-import React , {createContext, useContext, useReducer} from "react";
+import React , {createContext, useContext, useReducer , useState} from "react";
 
 const GlobalContext = createContext();
 
@@ -17,6 +17,8 @@ const reducer = (state,action)=>{
             return{...state,loading:true}
         case GET_POPULAR_ANIME:
             return{...state,popularAnime:action.payload,loading:false}
+        case SEARCH:
+            return{...state,searchResults:action.payload,loading:false}
         default:
             return state
     }
@@ -37,13 +39,39 @@ export const GlobalContextProvider = ({children})=>{
         loading:false,
     }
     const [state,disptach] = useReducer(reducer,initalState);
+    const [search,setSearch] = useState('');
 
+    const handleChange = (e)=>{
+        setSearch(e.target.value);
+        if(e.target.value===''){
+            state.isSearch = false;
+        }
+    }
+
+    const handleSubmit = (e)=>{
+        e.preventDefault();
+        if(search){
+            searchAnime(search);
+            state.isSearch=true;
+        }
+        else{
+            state.isSearch=false;
+            alert('please Enter Valid search...')
+        }
+    }
 
     const getPopularAnime = async()=>{
         disptach({type:LOADING})
         const response = await fetch(`${base_url}/top/anime?filter=bypopularity`);
         const data = await response.json();
         disptach({type:GET_POPULAR_ANIME,payload:data.data})
+    }
+
+    const searchAnime = async(anime)=>{
+        disptach({type:LOADING})
+        const responce = await fetch(`https://api.jikan.moe/v4/anime?q=${anime}&order_by=popularity&sort=asc&sfw`);
+        const data = await responce.json();
+        disptach({type:SEARCH,payload:data.data})
     }
 
     React.useEffect(()=>{
@@ -54,7 +82,11 @@ export const GlobalContextProvider = ({children})=>{
 
     return (
         <GlobalContext.Provider value={{
-            ...state,           
+            ...state,
+            handleChange,
+            handleSubmit,
+            searchAnime,
+            search,           
         }}>
             {children}
         </GlobalContext.Provider>

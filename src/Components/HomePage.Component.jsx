@@ -1,7 +1,10 @@
 import { useState } from "react"
 import Popular from "./Popular.Component";
+import { useGlobalContext } from "../context/GlobalContext";
 
 const HomePage = () => {
+
+    const {handleChange,handleSubmit,searchAnime,search} = useGlobalContext();
 
     const [rendered,setRendered] = useState('Popular');
 
@@ -32,7 +35,10 @@ const HomePage = () => {
                         </button>
                     </div>
                     <form action="" className="search-form">
-                        <div className="input-control"></div>
+                        <div className="input-control">
+                            <input type="text" placeholder="Search Anime..."value={search}onChange={handleChange} />
+                            <button type="submit" onClick={handleSubmit}> Search </button>
+                        </div>
                     </form>
                 </div>
             </header>
