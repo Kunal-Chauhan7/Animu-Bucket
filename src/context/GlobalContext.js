@@ -19,6 +19,10 @@ const reducer = (state,action)=>{
             return{...state,popularAnime:action.payload,loading:false}
         case SEARCH:
             return{...state,searchResults:action.payload,loading:false}
+        case GET_UPCOMING_ANIME:
+            return {...state,upcomingAnime:action.payload,loading:false}
+        case GET_AIRING_ANIME:
+            return{...state,airingAnime:action.payload,loading:false}
         default:
             return state
     }
@@ -67,6 +71,21 @@ export const GlobalContextProvider = ({children})=>{
         disptach({type:GET_POPULAR_ANIME,payload:data.data})
     }
 
+    const getUpcomingAnime = async ()=>{
+        disptach({type:LOADING})
+        const responce = await fetch(`${base_url}/top/anime?filter=upcoming`);
+        const data = await responce.json();
+        disptach({type:GET_UPCOMING_ANIME,payload:data.data})
+    }
+
+    const getAiringAnime = async ()=>{
+        disptach({type:LOADING})
+        const responce = await fetch(`${base_url}/top/anime?filter=airing`);
+        const data = await responce.json();
+        disptach({type:GET_AIRING_ANIME,payload:data.data})
+    }
+
+
     const searchAnime = async(anime)=>{
         disptach({type:LOADING})
         const responce = await fetch(`https://api.jikan.moe/v4/anime?q=${anime}&order_by=popularity&sort=asc&sfw`);
@@ -86,7 +105,11 @@ export const GlobalContextProvider = ({children})=>{
             handleChange,
             handleSubmit,
             searchAnime,
-            search,           
+            search,
+            getPopularAnime,
+            getAiringAnime,
+            getUpcomingAnime,
+                       
         }}>
             {children}
         </GlobalContext.Provider>
