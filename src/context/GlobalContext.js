@@ -10,6 +10,7 @@ const SEARCH = "SEARCH"
 const GET_POPULAR_ANIME = "GET_POPULAR_ANIME";
 const GET_UPCOMING_ANIME = "GET_UPCOMING_ANIME";
 const GET_AIRING_ANIME = "GET_AIRING_ANIME";
+const GET_PICTURES = "GET_PICTURES";
 
 const reducer = (state,action)=>{
     switch(action.type){
@@ -23,6 +24,8 @@ const reducer = (state,action)=>{
             return {...state,upcomingAnime:action.payload,loading:false}
         case GET_AIRING_ANIME:
             return{...state,airingAnime:action.payload,loading:false}
+        case GET_PICTURES:
+            return{...state,pictures:action.payload,loading:false}
         default:
             return state
     }
@@ -85,6 +88,13 @@ export const GlobalContextProvider = ({children})=>{
         disptach({type:GET_AIRING_ANIME,payload:data.data})
     }
 
+    const getAnimePictures = async(id)=>{
+        disptach({type:LOADING})
+        const responce = await fetch(`${base_url}/characters/${id}/pictures`);
+        const data = await responce.json();
+        disptach({type:GET_PICTURES,payload:data.data})
+    }
+
 
     const searchAnime = async(anime)=>{
         disptach({type:LOADING})
@@ -109,7 +119,7 @@ export const GlobalContextProvider = ({children})=>{
             getPopularAnime,
             getAiringAnime,
             getUpcomingAnime,
-                       
+            getAnimePictures,
         }}>
             {children}
         </GlobalContext.Provider>
