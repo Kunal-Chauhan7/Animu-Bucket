@@ -45,6 +45,7 @@ const HomePage = () => {
                             setRendered('Popular')
                         }}>
                             Popular
+                            <i className="fas fa-fire"/>
                         </button>
                     </div>
                     <form action="" className="search-form">
