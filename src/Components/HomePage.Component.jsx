@@ -35,7 +35,7 @@ const HomePage = () => {
         <HomePageStyle>
             <header>
                 <div className="logo">
-                    <h1>
+                    <h1 className="header">
                         {rendered==='Popular'?'Popular Anime':rendered==='airing'?'Airing Anime':'Upcoming Anime'}
                     </h1>
                 </div>
@@ -79,6 +79,28 @@ const HomePage = () => {
 
 
 const HomePageStyle = styled.div`
+    .header {
+	font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+	font-size:4rem;
+	font-weight:  100;
+	letter-spacing: 2px;
+	text-align: center;
+	color: #f35626;
+	background-image: -webkit-linear-gradient(92deg, #f35626, #feab3a);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	-webkit-animation: hue 10s infinite linear;
+}
+
+@-webkit-keyframes hue {
+  from {
+    -webkit-filter: hue-rotate(0deg);
+  }
+  to {
+    -webkit-filter: hue-rotate(-360deg);
+  }
+}
+
     background-color: #EDEDED;
     header{
         padding: 2rem 5rem;
@@ -99,20 +121,25 @@ const HomePageStyle = styled.div`
             align-items:center;
             justify-content:center;
             gap:1rem;
-            button{
-                display:flex;
-                align-items:center;
-                gap:.5rem;
-                padding:.7rem 1.5rem;
-                outline:none;
-                border-radius:30px;
-                font-size:1.2rem;
-                background-color:#fff;
-                cursor:pointer;
-                transition: all .4s ease-in-out;
-                font-family: inherit;
-                border: 5px solid #e5e7eb;
-            }
+            button {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1.5rem;
+    outline: none;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    background-image: linear-gradient(to top, #ff0844 0%, #ffb199 100%);
+    cursor: pointer;
+    transition: all .4s ease-in-out;
+    font-family: inherit;
+    border: 5px solid #e5e7eb;
+}
+
+button:hover {
+    background-image: linear-gradient(to top, #0ba360 0%, #3cba92 100%);
+    border: 5px solid #4caf50;
+}
             form{
                 position: relative;
                 width: 100%;
