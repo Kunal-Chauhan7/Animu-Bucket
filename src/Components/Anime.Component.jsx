@@ -4,17 +4,25 @@ import styled from "styled-components";
 import '../Css/Tv.css';
 const AnimeItem = () => {
     const { id } = useParams();
-
-
     const [anime, setAnime] = useState({});
     const [characters, setCharacters] = useState([]);
     const [showMore, setShowMore] = useState(false);
+    const [animeEpisodes, setAnimeEpisodes] = useState(0);
+    const [requiredTimeTOWatch,setrequiredTimeTOWatch] = useState(0);
 
     const getAnime = async (anime) => {
         const responce = await fetch(`https://api.jikan.moe/v4/anime/${anime}`)
         const data = await responce.json();
         setAnime(data.data);
-        console.log(data.data)
+    }
+
+    const getAnimeEpisodes = async(anime) =>{
+        const responce = await fetch(`https://api.jikan.moe/v4/anime/${anime}/episodes`);
+        const data = await responce.json();
+        setAnimeEpisodes(data.data.length);
+        let totaltime = data.data.length*24;
+        totaltime = Math.floor(totaltime / 60);
+        setrequiredTimeTOWatch(totaltime);
     }
 
     const getCharacters = async (anime) => {
@@ -31,8 +39,18 @@ const AnimeItem = () => {
     useEffect(() => {
         getAnime(id);
         getCharacters(id);
+        getAnimeEpisodes(id);
     }, [])
 
+
+    let episodesButton = [];
+    for (let i = 0; i < animeEpisodes; i++) {
+        episodesButton.push(
+            <div key={i}>
+                <button>Button {i + 1}</button>
+            </div>
+        );
+    }
     return (
         <AnimeItemStyled>
             <h1 className="header">{title}</h1>
@@ -52,7 +70,8 @@ const AnimeItem = () => {
                         <p><span>Source:</span><span>{source}</span></p>
                         <p><span>Season:</span><span>{season}</span></p>
                         <p><span>Duration:</span><span>{duration}</span></p>
-
+                        <p><span>Number of Episodes:</span><span>{animeEpisodes}</span></p>
+                        <p><span>Total Time Required to watch:</span><span>{requiredTimeTOWatch}hr</span></p>
                     </div>
                 </div>
                 <p className="description">
@@ -63,12 +82,12 @@ const AnimeItem = () => {
                 </p>
             </div>
             <h3 className="title">Trailer</h3>
-            <div class="trailer-container">
+            <div className="trailer-container">
                 {trailer?.embed_url ?
-                    <div class="container">
-                        <div class="monitor">
-                            <div class="monitor-screen">
-                                <iframe src={trailer?.embed_url} title={title} width="800" height="450" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <div className="container">
+                        <div className="monitor">
+                            <div className="monitor-screen">
+                                <iframe src={trailer?.embed_url} title={title} width="800" height="450" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
                             </div>
                         </div>
                     </div> : <div>
@@ -76,6 +95,15 @@ const AnimeItem = () => {
                         </h3>
                     </div>}
             </div>
+
+            <div>
+                <h3>Watch here</h3>
+                <div>
+                    {episodesButton}
+                </div>
+            </div>
+
+
             <h3 className="title">Characters</h3>
             <div className="characters">
                 {characters.map((character, index) => {
