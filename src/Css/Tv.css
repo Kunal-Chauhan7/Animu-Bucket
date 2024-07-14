@@ -3,6 +3,27 @@ body {
     background-color: #222;
 }
 
+.episodeContainerButton{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5vh;
+}
+
+.episodeButtonClass{
+    width: 50px;
+    height: 25px;
+    background-color: lightgreen;
+    border-radius: 5px;
+    border: none;
+}
+
+.episodeButtonClass:hover{
+    background-color: rgb(0, 255, 200);
+    transform: scaleY(1.1);
+    transform: scaleX(1.1);
+}
+
 .trailer-container {
     max-width: 1024px;
     margin: auto;

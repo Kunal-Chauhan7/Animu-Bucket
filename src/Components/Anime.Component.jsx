@@ -2,55 +2,69 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import '../Css/Tv.css';
+
 const AnimeItem = () => {
     const { id } = useParams();
     const [anime, setAnime] = useState({});
     const [characters, setCharacters] = useState([]);
     const [showMore, setShowMore] = useState(false);
     const [animeEpisodes, setAnimeEpisodes] = useState(0);
-    const [requiredTimeTOWatch,setrequiredTimeTOWatch] = useState(0);
+    const [requiredTimeTOWatch, setRequiredTimeTOWatch] = useState(0);
+    const [currentAnimeEpisode, setCurrentAnimeEpisode] = useState(1);
 
-    const getAnime = async (anime) => {
-        const responce = await fetch(`https://api.jikan.moe/v4/anime/${anime}`)
-        const data = await responce.json();
+    const getAnime = async (animeId) => {
+        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}`)
+        const data = await response.json();
         setAnime(data.data);
     }
 
-    const getAnimeEpisodes = async(anime) =>{
-        const responce = await fetch(`https://api.jikan.moe/v4/anime/${anime}/episodes`);
-        const data = await responce.json();
-        setAnimeEpisodes(data.data.length);
-        let totaltime = data.data.length*24;
-        totaltime = Math.floor(totaltime / 60);
-        setrequiredTimeTOWatch(totaltime);
+    const getAnimeEpisodes = async (animeId) => {
+        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/episodes`);
+        const data = await response.json();
+        const totalEpisodes = data.data.length;
+        setAnimeEpisodes(totalEpisodes);
+        const totalHours = Math.floor(totalEpisodes * 24 / 60);
+        setRequiredTimeTOWatch(totalHours);
     }
 
-    const getCharacters = async (anime) => {
-        const responce = await fetch(`https://api.jikan.moe/v4/anime/${anime}/characters`)
-        const data = await responce.json();
+    const getCharacters = async (animeId) => {
+        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/characters`)
+        const data = await response.json();
         setCharacters(data.data);
     }
-
-    const { title, synopsis, trailer, duration, aired,
-        season, images, rank, score, scored_by,
-        popularity, status, rating, source } = anime;
-
 
     useEffect(() => {
         getAnime(id);
         getCharacters(id);
         getAnimeEpisodes(id);
-    }, [])
+    }, [id])
 
+    const handleEpisodeChange = (value) => {
+        setCurrentAnimeEpisode(value);
+    }
 
-    let episodesButton = [];
+    const episodesButtons = [];
     for (let i = 0; i < animeEpisodes; i++) {
-        episodesButton.push(
+        const episodeNumber = i + 1;
+        episodesButtons.push(
             <div key={i}>
-                <button>Button {i + 1}</button>
+                <button
+                    className="episodeButtonClass"
+                    onClick={() => handleEpisodeChange(episodeNumber)}
+                    value={episodeNumber}
+                >
+                    {episodeNumber}
+                </button>
             </div>
         );
     }
+
+    const {
+        title, synopsis, trailer, duration, aired,
+        season, images, rank, score, scored_by,
+        popularity, status, rating, source
+    } = anime;
+
     return (
         <AnimeItemStyled>
             <h1 className="header">{title}</h1>
@@ -76,50 +90,63 @@ const AnimeItem = () => {
                 </div>
                 <p className="description">
                     {showMore ? synopsis : synopsis?.substring(0, 450) + "..."}
-                    <button onClick={() => {
-                        setShowMore(!showMore)
-                    }}>{showMore ? 'Show less' : 'Read more'}</button>
+                    <button onClick={() => setShowMore(!showMore)}>
+                        {showMore ? 'Show less' : 'Read more'}
+                    </button>
                 </p>
             </div>
+
             <h3 className="title">Trailer</h3>
             <div className="trailer-container">
                 {trailer?.embed_url ?
                     <div className="container">
                         <div className="monitor">
                             <div className="monitor-screen">
-                                <iframe src={trailer?.embed_url} title={title} width="800" height="450" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                <iframe
+                                    src={trailer?.embed_url}
+                                    title={title}
+                                    width="800"
+                                    height="450"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowFullScreen
+                                ></iframe>
                             </div>
                         </div>
-                    </div> : <div>
-                        <h3>Trailer not available :(
-                        </h3>
-                    </div>}
+                    </div>
+                    : <div>
+                        <h3>Trailer not available :(</h3>
+                    </div>
+                }
             </div>
 
             <div>
                 <h3>Watch here</h3>
-                <div>
-                    {episodesButton}
+                <div className="episodeContainerButton">
+                    {episodesButtons}
                 </div>
             </div>
 
+            <div className="Player">
+            </div>
 
             <h3 className="title">Characters</h3>
             <div className="characters">
                 {characters.map((character, index) => {
                     const { role } = character;
                     const { images, name, mal_id } = character.character;
-                    return <Link to={`/character/${mal_id}`} key={index}>
-                        <div className="character">
-                            <img src={images?.jpg.image_url} alt="" />
-                            <h4>{name}</h4>
-                            <p>{role}</p>
-                        </div>
-                    </Link>
+                    return (
+                        <Link to={`/character/${mal_id}`} key={index}>
+                            <div className="character">
+                                <img src={images?.jpg.image_url} alt="" />
+                                <h4>{name}</h4>
+                                <p>{role}</p>
+                            </div>
+                        </Link>
+                    );
                 })}
             </div>
         </AnimeItemStyled>
-    )
+    );
 }
 
 const AnimeItemStyled = styled.div`
