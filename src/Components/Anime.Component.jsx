@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import '../Css/Tv.css';
 
+
 const AnimeItem = () => {
     const { id } = useParams();
     const [anime, setAnime] = useState({});
@@ -11,7 +12,7 @@ const AnimeItem = () => {
     const [animeEpisodes, setAnimeEpisodes] = useState(0);
     const [requiredTimeTOWatch, setRequiredTimeTOWatch] = useState(0);
     const [currentAnimeEpisode, setCurrentAnimeEpisode] = useState(1);
-
+    const [animeStreaming,setanimeStreaming] = useState("");
     const getAnime = async (animeId) => {
         const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}`)
         const data = await response.json();
@@ -41,6 +42,9 @@ const AnimeItem = () => {
 
     const handleEpisodeChange = (value) => {
         setCurrentAnimeEpisode(value);
+        let animename = title.split(" ").join("-");
+        let url = `https://animu-bucket-api.vercel.app/anime/gogoanime/watch/${animename}-episode-${value}`;
+        console.log(url);
     }
 
     const episodesButtons = [];
@@ -126,8 +130,11 @@ const AnimeItem = () => {
                 </div>
             </div>
 
-            <div className="Player">
-            </div>
+            {/*<div className="Player">
+            <video id="my-video" class="video-js" controls preload="auto" width="640" height="264"data-setup="{}">
+                <source src="https://www111.anicdnstream.info/videos/hls/5k97Ff0ZqHemEJOs9MKGhw/1720976952/184141/0789fd4f049c3ca2a49b860ea5d1f456/ep.1.1709225406.m3u8"/>
+            </video>
+            </div>*/}
 
             <h3 className="title">Characters</h3>
             <div className="characters">
