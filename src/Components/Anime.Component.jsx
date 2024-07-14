@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import '../Css/Tv.css';
-
-
+import axios from "axios";
+import videojs from 'video.js'; 
+import '@videojs/http-streaming'
 const AnimeItem = () => {
     const { id } = useParams();
     const [anime, setAnime] = useState({});
@@ -12,12 +13,14 @@ const AnimeItem = () => {
     const [animeEpisodes, setAnimeEpisodes] = useState(0);
     const [requiredTimeTOWatch, setRequiredTimeTOWatch] = useState(0);
     const [currentAnimeEpisode, setCurrentAnimeEpisode] = useState(1);
-    const [animeStreaming,setanimeStreaming] = useState("");
+    const [animeStreaming, setAnimeStreaming] = useState("");
+    const [animeDownloadLink, setAnimeDownloadLink] = useState("");
+
     const getAnime = async (animeId) => {
-        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}`)
+        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}`);
         const data = await response.json();
         setAnime(data.data);
-    }
+    };
 
     const getAnimeEpisodes = async (animeId) => {
         const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/episodes`);
@@ -26,26 +29,43 @@ const AnimeItem = () => {
         setAnimeEpisodes(totalEpisodes);
         const totalHours = Math.floor(totalEpisodes * 24 / 60);
         setRequiredTimeTOWatch(totalHours);
-    }
+    };
 
     const getCharacters = async (animeId) => {
-        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/characters`)
+        const response = await fetch(`https://api.jikan.moe/v4/anime/${animeId}/characters`);
         const data = await response.json();
         setCharacters(data.data);
-    }
+    };
 
     useEffect(() => {
         getAnime(id);
         getCharacters(id);
         getAnimeEpisodes(id);
-    }, [id])
+    }, [id]);
 
-    const handleEpisodeChange = (value) => {
+    useEffect(() => {
+        if (animeEpisodes > 0) {
+            handleEpisodeChange(1);
+        }
+    }, [animeEpisodes]);
+
+    const handleEpisodeChange = async (value) => {
         setCurrentAnimeEpisode(value);
-        let animename = title.split(" ").join("-");
-        let url = `https://animu-bucket-api.vercel.app/anime/gogoanime/watch/${animename}-episode-${value}`;
-        console.log(url);
-    }
+        let animename = anime.title.split(" ").join("-");
+        animename = animename.replace(":","")
+        const url = `https://animu-bucket-api.vercel.app/anime/gogoanime/watch/${animename}-episode-${value}`;
+        const response = await axios.get(url);
+        setAnimeDownloadLink(response.data["download"]);
+        setAnimeStreaming(response.data["sources"][2].url);
+    };
+
+    useEffect(() => {
+        if (animeStreaming) {
+            const player = videojs('my-video');
+            player.src({ type: 'application/x-mpegURL', src: animeStreaming });
+            player.load();
+        }
+    }, [animeStreaming]);
 
     const episodesButtons = [];
     for (let i = 0; i < animeEpisodes; i++) {
@@ -130,11 +150,11 @@ const AnimeItem = () => {
                 </div>
             </div>
 
-            {/*<div className="Player">
-            <video id="my-video" class="video-js" controls preload="auto" width="640" height="264"data-setup="{}">
-                <source src="https://www111.anicdnstream.info/videos/hls/5k97Ff0ZqHemEJOs9MKGhw/1720976952/184141/0789fd4f049c3ca2a49b860ea5d1f456/ep.1.1709225406.m3u8"/>
-            </video>
-            </div>*/}
+            <div className="Player">
+                <video id="my-video" className="video-js playerkaClass" controls preload="auto" width="640" height="400" data-setup="{}">
+                    <source src={animeStreaming} type="application/x-mpegURL" />
+                </video>
+            </div>
 
             <h3 className="title">Characters</h3>
             <div className="characters">
@@ -154,7 +174,7 @@ const AnimeItem = () => {
             </div>
         </AnimeItemStyled>
     );
-}
+};
 
 const AnimeItemStyled = styled.div`
     .image{

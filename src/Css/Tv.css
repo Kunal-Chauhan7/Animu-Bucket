@@ -3,6 +3,23 @@ body {
     background-color: #222;
 }
 
+.Player{
+    padding-top: 7vh;
+    padding-left: 30vh;
+    display: flex;
+}
+
+.playerkaClass{
+    border: none;
+    border-radius: 2%;
+}
+
+.episodeContainerButton{
+    padding-top: 5vh;
+    padding-left: 30vh;
+    width: 150vh;
+}
+
 .episodeContainerButton{
     display: flex;
     align-items: center;
